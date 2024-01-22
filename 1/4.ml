@@ -1,4 +1,4 @@
-(* Write a function set_all_union a that returns a list representing ∪[x∈a]x, i.e., the union of all the members of the set a; a should represent a set of sets. *)
+(* 4. Write a function set_all_union a that returns a list representing ∪[x∈a]x, i.e., the union of all the members of the set a; a should represent a set of sets. *)
 
 (*
 *)
@@ -31,12 +31,9 @@ let rec set_all_union a =
     | h::t -> set_union h (set_all_union t);;
 
 
-let set_all_union_test0 =
-  equal_sets (set_all_union []) []
-let set_all_union_test1 =
-  equal_sets (set_all_union [[3;1;3]; [4]; [1;2;3]]) [1;2;3;4]
-let set_all_union_test2 =
-  equal_sets (set_all_union [[5;2]; []; [5;2]; [3;5;7]]) [2;3;5;7]
+let set_all_union_test0 = equal_sets (set_all_union []) []
+let set_all_union_test1 = equal_sets (set_all_union [[3;1;3]; [4]; [1;2;3]]) [1;2;3;4]
+let set_all_union_test2 = equal_sets (set_all_union [[5;2]; []; [5;2]; [3;5;7]]) [2;3;5;7]
 let set_all_union_test3 = equal_sets (set_all_union [[1; 2]; [2; 3]; [3; 4]]) [1; 2; 3; 4]
 let set_all_union_test4 = equal_sets (set_all_union [[1]; [1]; [1]]) [1]
 let set_all_union_test5 = equal_sets (set_all_union [[1; 2; 3]; []; [4; 5]]) [1; 2; 3; 4; 5]

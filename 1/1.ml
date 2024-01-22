@@ -1,3 +1,5 @@
+(* 1. The function (subset a b) returns true iff a is a subset of b. Note that every set is a subset of itself. *) 
+
 let rec subset a b = 
    match a with (* This is how we get the head and tail of a instead of b *)
    | [] -> true
@@ -8,7 +10,6 @@ let rec subset a b =
 let subset_test0 = subset [] [1;2;3]
 let subset_test1 = subset [3;1;3] [1;2;3]
 let subset_test2 = not (subset [1;3;7] [4;1;3])
-
 let subset_test3 = subset [] []
 let subset_test4 = subset [] [5; 6; 7]
 let subset_test5 = not (subset [1] [])

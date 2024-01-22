@@ -1,3 +1,5 @@
+(* 2. The function (equal_sets a b) returns true iff a and b are equal set. *)
+
 (* 'a list -> 'a list *)
 let rec remove_duplicates lst =
     match lst with 

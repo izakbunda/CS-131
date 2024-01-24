@@ -16,13 +16,43 @@
 let subset_test0 = subset [] [1;2;3]
 let subset_test1 = subset [3;1;3] [1;2;3]
 let subset_test2 = not (subset [1;3;7] [4;1;3])
+let subset_test3 = subset [] []
+let subset_test4 = subset [] [5; 6; 7]
+let subset_test5 = not (subset [1] [])
+let subset_test6 = subset [1; 2; 3] [1; 2; 3]
+let subset_test7 = subset [2; 3] [1; 2; 3; 4]
+let subset_test8 = not (subset [1; 2; 4] [1; 2; 3])
+let subset_test9 = subset [3; 3; 2] [2; 3; 3; 4]
+let subset_test10 = subset [3; 3; 2] [2; 3; 4; 4]
+let subset_test11 = subset [3; 2; 1] [1; 2; 3]
+let subset_test12 = not (subset [1; 2; 3; 4] [1; 2; 3])
 
 let equal_sets_test0 = equal_sets [1;3] [3;1;3]
 let equal_sets_test1 = not (equal_sets [1;3;4] [3;1;3])
+let equal_sets_test2 = equal_sets [] []
+let equal_sets_test3 = not (equal_sets [] [1; 2; 3]) (* err *)
+let equal_sets_test4 = equal_sets [1; 2; 3] [1; 2; 3]
+let equal_sets_test5 = equal_sets [2; 1; 3] [1; 3; 2]
+let equal_sets_test6 = equal_sets [1; 2; 2; 3] [3; 2; 1; 1] (* err *)
+let equal_sets_test7 = not (equal_sets [1; 2; 4] [1; 2; 3]) 
+let equal_sets_test8 = not (equal_sets [1; 2; 3] [1; 2; 3; 4]) (* err *)
+let equal_sets_test9 = equal_sets [1; 2; 3] [1; 2; 2; 3; 3; 1] 
+let equal_sets_test10 = not (equal_sets [4; 5; 6] [7; 8; 9]) 
+let equal_sets_test11 = equal_sets [10; 20; 30; 40; 50] [50; 40; 30; 20; 10]
 
 let set_union_test0 = equal_sets (set_union [] [1;2;3]) [1;2;3]
 let set_union_test1 = equal_sets (set_union [3;1;3] [1;2;3]) [1;2;3]
-let set_union_test2 = equal_sets (set_union [] []) []
+let set_union_test2 = equal_sets [3;1;3;1;2;3] [1;2;3]
+let set_union_test3 = equal_sets (set_union [] []) []
+let set_union_test4 = equal_sets (set_union [] [1; 2; 3]) [1; 2; 3]
+let set_union_test5 = equal_sets (set_union [1; 2; 3] []) [1; 2; 3]
+let set_union_test6 = equal_sets (set_union [1; 2; 3] [1; 2; 3]) [1; 2; 3]
+let set_union_test7 = equal_sets (set_union [1; 2; 3] [4; 5; 6]) [1; 2; 3; 4; 5; 6]
+let set_union_test8 = equal_sets (set_union [1; 2] [2; 3; 4]) [1; 2; 3; 4]
+let set_union_test9 = equal_sets (set_union [1; 2; 2; 3] [2; 4; 4]) [1; 2; 3; 4]
+let set_union_test10 = equal_sets (set_union [1; 2; 3; 3; 4; 5] [4; 5; 6; 7]) [1; 2; 3; 4; 5; 6; 7]
+let set_union_test11 = equal_sets (set_union [1; 1; 1] [1; 1]) [1]
+let set_union_test12 = equal_sets (set_union [1; 2; 2; 3] [2; 2; 3; 4; 4]) [1; 2; 3; 4]
 
 let set_all_union_test0 =
   equal_sets (set_all_union []) []
@@ -30,6 +60,15 @@ let set_all_union_test1 =
   equal_sets (set_all_union [[3;1;3]; [4]; [1;2;3]]) [1;2;3;4]
 let set_all_union_test2 =
   equal_sets (set_all_union [[5;2]; []; [5;2]; [3;5;7]]) [2;3;5;7]
+
+let set_all_union_test3 = equal_sets (set_all_union [[1; 2]; [2; 3]; [3; 4]]) [1; 2; 3; 4]
+let set_all_union_test4 = equal_sets (set_all_union [[1]; [1]; [1]]) [1]
+let set_all_union_test5 = equal_sets (set_all_union [[1; 2; 3]; []; [4; 5]]) [1; 2; 3; 4; 5]
+let set_all_union_test6 = equal_sets (set_all_union [[10]; [20]; [30]; [40; 50]]) [10; 20; 30; 40; 50]
+let set_all_union_test7 = equal_sets (set_all_union [[6; 7; 8]; [9; 10; 11]; [6; 12; 13]]) [6; 7; 8; 9; 10; 11; 12; 13]
+let set_all_union_test8 = equal_sets (set_all_union [[1; 2; 3]; [3; 4; 5]; [5; 6; 7]; [7; 8; 9]]) [1; 2; 3; 4; 5; 6; 7; 8; 9]
+let set_all_union_test9 = equal_sets (set_all_union [[]; []; []]) []
+let set_all_union_test10 = equal_sets (set_all_union [[1; 2; 3]; []; [4; 5; 6]; []; [7; 8; 9]]) [1; 2; 3; 4; 5; 6; 7; 8; 9]
 
 let computed_fixed_point_test0 =
   computed_fixed_point (=) (fun x -> x / 2) 1000000000 = 0
@@ -42,11 +81,23 @@ let computed_fixed_point_test3 =
 			 (fun x -> x /. 2.)
 			 10.)
    = 1.25)
+  
+let computed_fixed_point_test4 = computed_fixed_point (=) (fun x -> x / 5) 100 = 0
 
 let computed_periodic_point_test0 =
   computed_periodic_point (=) (fun x -> x / 2) 0 (-1) = -1
 let computed_periodic_point_test1 =
   computed_periodic_point (=) (fun x -> x *. x -. 1.) 2 0.5 = -1.
+
+let computed_periodic_point_test2 = computed_periodic_point (=) (fun x -> x - x * x) 0 2 = 2
+
+let whileseq_test0 = whileseq ((+) 3) ((>) 10) 0;; (* [0; 3; 6; 9] *) 
+let whileseq_test1 = whileseq ((+) 2) ((>) 20) 5;; (* [5; 7; 9; 11; 13; 15; 17; 19] *)
+let whileseq_test2 = whileseq (( * ) 2) ((>) 100) 1;; (* [1; 2; 4; 8; 16; 32; 64] *)
+let whileseq_test3 = whileseq ((+) 3) ((>) 10) (-5);; (* [-5; -2; 1; 4; 7] *)
+let whileseq_test4 = whileseq ((-) 2) ((<) 0) 10;; (* [10; 8; 6; 4; 2] *)
+let whileseq_test5 = whileseq ((+) 5) ((>) 30) 0;; (* [0; 5; 10; 15; 20; 25] *)
+let whileseq_test6 = whileseq (( *. ) 2.) ((>) 10.) 1.;; (* [1.; 2.; 4.; 8.] *)
 
 (* An example grammar for a small subset of Awk.  *)
 

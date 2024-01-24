@@ -11,11 +11,10 @@
 (* : ('a -> 'a -> bool) -> ('a -> 'a) -> 'a -> 'a *)
 let rec computed_fixed_point eq f x =
   let result = f x in
-  if eq result x then
-    result
+  if eq x result then
+    x
   else
-    computed_fixed_point eq f result
-
+    computed_fixed_point eq f (f x)
 
 let computed_fixed_point_test0 = computed_fixed_point (=) (fun x -> x / 2) 1000000000 = 0
 let computed_fixed_point_test1 = computed_fixed_point (=) (fun x -> x *. 2.) 1. = infinity
@@ -23,6 +22,8 @@ let computed_fixed_point_test2 = computed_fixed_point (=) sqrt 10. = 1.
 
 let computed_fixed_point_test3 =
   ((computed_fixed_point (fun x y -> abs_float (x -. y) < 1.)
-			 (fun x -> x /. 2.)
-			 10.)
+                         (fun x -> x /. 2.)
+                         10.)
    = 1.25)
+
+let computed_fixed_point_test4 = computed_fixed_point (=) (fun x -> x / 5) 100 = 0

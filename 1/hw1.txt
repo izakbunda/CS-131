@@ -1,0 +1,14 @@
+1.-4. - For these ones, my process first involved creating Python counterparts for these, at first iteratively, 
+        then translated that to recursive functions. I reached this method because I found that writing OCaml computed
+        code directly with no experience to be very difficult, but by question 4, I think I was more confident in
+        writing OCaml code. 
+
+5. - This one took a while because I think I am still confused about what the paradox even is.
+
+6. - Again, after writing multiple OCaml functions, I found 6 not to be too hard at all. I think checking the type
+     of the function was really helpful in making sure that I was returning the proper things in the match statements
+     because at first I kept returning result instead of x and result instead of (f x) and that introduced a lot of bugs
+     that I had to stop and thought of for a bit.
+
+7. - For this one, I found more difficulty trying to create the OCaml function from scratch so I had to go back to my
+     original strategy of writing first a Python function then translating it to OCaml.

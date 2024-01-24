@@ -11,7 +11,10 @@ let rec remove_duplicates lst =
                 then remove_duplicates t 
             else h :: remove_duplicates t;;
 
-(* remove_duplicates [1;1;1;1;1;1;1;1];; *)
+let rec remove_first_occurrence x lst =
+    match lst with
+    | [] -> []
+    | h::t -> if h = x then t else h :: remove_first_occurrence x t
 
 let rec equal_sets a b = 
     let a_nd = remove_duplicates a in

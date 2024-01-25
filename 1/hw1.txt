@@ -6,9 +6,20 @@
 5. - This one took a while because I think I am still confused about what the paradox even is.
 
 6. - Again, after writing multiple OCaml functions, I found 6 not to be too hard at all. I think checking the type
-     of the function was really helpful in making sure that I was returning the proper things in the match statements
-     because at first I kept returning result instead of x and result instead of (f x) and that introduced a lot of bugs
-     that I had to stop and thought of for a bit.
+     of the function was really helpful in making sure that I was returning the proper things in the match statements.
 
 7. - For this one, I found more difficulty trying to create the OCaml function from scratch so I had to go back to my
      original strategy of writing first a Python function then translating it to OCaml.
+
+8. - Okay, same for this one. Although at the end, it seems pretty natural to read in OCaml, I had to first create this in
+     Python and translate it to OCaml.
+
+9. - I created rhs_symbols_terminal to check if all symbols in a sequence can lead to terminal strings and then update_terminal_symbols
+     to update the list of known terminal symbols based on the current rules we've found so far. 
+     Then, in order to make sure that no new symbols are getting added into the set, I had to make terminal_sets_equal which actually user
+     the equal_sets function from before.
+     Then, another place where a previous function from this homework came in  handy was trying to actualy find the terminal symbols. This is
+     what first came naturally to me and what I first considered a hint considering that we implemented computed_fixed_point.
+
+Weakness (for all functions where Python is mentioned): maybe it's not optimized for the functional programming style of Ocaml since it's 
+loosely based on Python (not functional)?

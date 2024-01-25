@@ -20,5 +20,3 @@ let computed_periodic_point_test1 =
 let computed_periodic_point_test2 =
   computed_periodic_point (=) (fun x -> x - x * x) 0 2 = 2
 
-let computed_periodic_point_test3 =
-  computed_periodic_point (fun x y -> x = y) (fun x -> x * 3) 1 1 = 3

@@ -114,4 +114,42 @@ type ('nonterminal, 'terminal) symbol =
   | N of 'nonterminal
   | T of 'terminal
 
-let filter_blind_alleys g = g;;
+(* Checks if all symbols in a sequence can lead to terminal strings *)
+let rec rhs_symbols_terminal rhs known_terminals = match rhs with
+  | [] -> true
+  | h::t -> 
+      (match h with 
+      | T _ -> true
+      | N _ -> List.mem h known_terminals) && rhs_symbols_terminal t known_terminals;;
+
+(* Updates the list of known terminal symbols based on current rules *)
+let rec update_terminal_symbols rules current_terminals = match rules with
+  | [] -> current_terminals
+  | (symbol, rhs)::remaining_rules -> let new_terminals = 
+                                      if rhs_symbols_terminal rhs current_terminals then N symbol :: current_terminals
+                                      else current_terminals 
+   in
+   update_terminal_symbols remaining_rules new_terminals;;
+
+(* FUnction for checking if terminal symbol sets are equal using eqaul_sets *)
+let terminal_sets_equal (x, terminals1) (y, terminals2) = equal_sets terminals1 terminals2;;
+
+(* Repeatedly identifies terminal symbols until no new ones are found *)
+let identify_terminal_symbols rules = 
+  computed_fixed_point terminal_sets_equal (fun (r, ts) -> (r, update_terminal_symbols r ts)) (rules, []);;
+
+(* Filters out rules that do not lead to terminal strings *)
+let rec filter_non_terminal_rules (rules, known_terminals) = match rules with 
+  | [] -> []
+  | (symbol, rhs)::remaining_rules -> 
+      if rhs_symbols_terminal rhs known_terminals then
+        (symbol, rhs) :: filter_non_terminal_rules (remaining_rules, known_terminals)
+      else
+        filter_non_terminal_rules (remaining_rules, known_terminals);;
+
+(* Main function to remove blind alley rules from a grammar *)
+let filter_blind_alleys g =
+   match g with
+   | (start, []) -> g
+   | (start, rules) -> (start, filter_non_terminal_rules (identify_terminal_symbols rules));;
+

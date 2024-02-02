@@ -5,8 +5,55 @@
    that is equivalent to the Homework 1-style grammar awksub_grammar. *)
 
 
+(* add_to_alist: awksub_nonterminals -> symbol -> (awksub_nonterminals * (symbol list) list) ->  ( awksub_nonterminals * (symbol list) ) list *)
+(* Basically a dictionary because OCaml doesn't have a built in dictionary data structure *)
+(* DO NOT MESS UP ORDER!! *)
+
+let rec add_to_alist key value alist =
+  match alist with
+  | [] -> [(key, [value])] 
+  | (k, v)::tail ->
+      if k = key then
+        (k, v @ [value]) :: tail  
+      else
+        (k, v) :: (add_to_alist key value tail)  
+
+
+(* rules: rule list == (awksub_nonterminals * symbol list) list *)
+(* construct_map_from_rules: (awksub_nonterminals * symbol list) list -> (awksub_nonterminals * symbol list list) list *)
+
+let construct_map_from_rules rules =
+  List.fold_left (fun acc (non_terminal, expansion) ->
+    add_to_alist non_terminal expansion acc
+  ) [] rules;;
+
+(* convert_grammar: awksub_nonterminals * (awksub_nonterminals * symbol list) list ->  awksub_nonterminals * (awksub_nonterminals -> symbol list list) *)
+
+let convert_grammar gram1 =
+  let (start_symbol, rules) = gram1 in
+  let expansions_alist = construct_map_from_rules rules in
+  let expansion_function non_terminal =
+    match List.assoc_opt non_terminal expansions_alist with
+    | Some expansions -> expansions
+    | None -> []  (* Handle non-terminal with no expansions *)
+  in
+  (start_symbol, expansion_function);;
+
+
 (* 2. As another warmup, write a function parse_tree_leaves tree that traverses the parse tree tree left to right and yields a 
    list of the leaves encountered, in order. *)
+
+type ('nonterminal, 'terminal) parse_tree =
+  | Node of 'nonterminal * ('nonterminal, 'terminal) parse_tree list
+  | Leaf of 'terminal
+
+let rec parse_tree_leaves tree =
+  match tree with
+  | Leaf terminal -> [terminal]
+  | Node (_, children) -> 
+    List.fold_left (fun acc child -> 
+        acc @ parse_tree_leaves child) [] children;;
+
 
 (* 3. Write a function make_matcher gram that returns a matcher for the grammar gram. When applied to an acceptor accept and a 
    fragment frag, the matcher must try the grammar rules in order and return the result of calling accept on the suffix 
@@ -15,11 +62,15 @@
    matching prefix. When this happens, the matcher returns whatever the acceptor returned. If no acceptable match is found, the 
    matcher returns None. *)
 
+let make_matcher gram acceptor fragment = None;;
+
 (* 4. Write a function make_parser gram that returns a parser for the grammar gram. When applied to a fragment frag, the parser 
    returns an optional parse tree. If frag cannot be parsed entirely (that is, from beginning to end), the parser returns None. 
    Otherwise, it returns Some tree where tree is the parse tree corresponding to the input fragment. Your parser should try grammar 
    rules in the same order as make_matcher.
 *)
+
+let make_parser gram fragment = None;;
 
 (* 5. Write one good, nontrivial test case for your make_matcher function. It should be in the style of the test cases given below, 
    but should cover different problem areas. Your test case should be named make_matcher_test. Your test case should test a grammar

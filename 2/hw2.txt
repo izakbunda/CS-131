@@ -1,0 +1,4 @@
+Parser is like basically a special version of a matcher that ALWAYS ONLY uses an acceptor like accept_empty_suffix which
+only accepts an empty suffix []. So it makes more sense to me to create the matcher first.
+This is the main difference since both matcher and parser also share the use of a fragment.
+

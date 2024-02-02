@@ -30,13 +30,17 @@
 
 (* add_to_alist: awksub_nonterminals -> symbol -> (awksub_nonterminals * (symbol list) list) ->  ( awksub_nonterminals * (symbol list) ) list *)
 (* Basically a dictionary because OCaml doesn't have a built in dictionary data structure *)
+(* DO NOT MESS UP ORDER!! *)
 
 let rec add_to_alist key value alist =
   match alist with
-  | [] -> [(key, [value])]
+  | [] -> [(key, [value])] 
   | (k, v)::tail ->
-      if k = key then (k, value::v)::tail
-      else (k, v)::(add_to_alist key value tail)
+      if k = key then
+        (k, v @ [value]) :: tail  
+      else
+        (k, v) :: (add_to_alist key value tail)  
+
 
 (* rules: rule list == (awksub_nonterminals * symbol list) list *)
 (* construct_map_from_rules: (awksub_nonterminals * symbol list) list -> (awksub_nonterminals * symbol list list) list *)
@@ -59,20 +63,18 @@ let convert_grammar gram1 =
   (start_symbol, expansion_function)
 
 
-type ('nonterminal, 'terminal) symbol =
-  | N of 'nonterminal
-  | T of 'terminal
-
 type awksub_nonterminals =
-  | Expr | Lvalue | Incrop | Binop | Num
+  | Expr | Term | Lvalue | Incrop | Binop | Num
 
-let awksub_rules =
-   [Expr, [T"("; N Expr; T")"];
-    Expr, [N Num];
-    Expr, [N Expr; N Binop; N Expr];
-    Expr, [N Lvalue];
-    Expr, [N Incrop; N Lvalue];
-    Expr, [N Lvalue; N Incrop];
+let awksub1_rules =
+   [
+    Expr, [N Term; N Binop; N Expr];
+    Expr, [N Term];
+    Term, [N Num];
+    Term, [N Lvalue];
+    Term, [N Incrop; N Lvalue];
+    Term, [N Lvalue; N Incrop];
+    Term, [T"("; N Expr; T")"];
     Lvalue, [T"$"; N Expr];
     Incrop, [T"++"];
     Incrop, [T"--"];
@@ -87,8 +89,44 @@ let awksub_rules =
     Num, [T"6"];
     Num, [T"7"];
     Num, [T"8"];
-    Num, [T"9"]]
+    Num, [T"9"]
+  ]
 
-let awksub_grammar = (Expr , awksub_rules)
+let awksub1_grammar = Expr, awksub1_rules
 
-let converted_grammar = convert_grammar awksub_grammar;;
+let awkish_grammar =
+  (Expr,
+   function
+     | Expr ->
+         [[N Term; N Binop; N Expr];
+          [N Term]]
+     | Term ->
+	 [[N Num];
+	  [N Lvalue];
+	  [N Incrop; N Lvalue];
+	  [N Lvalue; N Incrop];
+	  [T"("; N Expr; T")"]]
+     | Lvalue ->
+	 [[T"$"; N Expr]]
+     | Incrop ->
+	 [[T"++"];
+	  [T"--"]]
+     | Binop ->
+	 [[T"+"];
+	  [T"-"]]
+     | Num ->
+	 [[T"0"]; [T"1"]; [T"2"]; [T"3"]; [T"4"];
+	  [T"5"]; [T"6"]; [T"7"]; [T"8"]; [T"9"]])
+
+let converted_gram = convert_grammar awksub1_grammar
+
+let test0 = 
+  (snd converted_gram) Num = [[T "0"]; [T "1"]; [T "2"]; [T "3"]; [T "4"]; 
+  [T "5"]; [T "6"]; [T "7"]; [T "8"]; [T "9"]]
+
+let test1 = (snd converted_gram) Incrop = [[T"++"]; [T"--"]]
+
+let test2 = (snd converted_gram) Lvalue = [[T"$"; N Expr]]
+
+let test3 = (snd converted_gram) Expr = [[N Term; N Binop; N Expr]; [N Term]]
+

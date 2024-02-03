@@ -127,7 +127,7 @@ let genz_grammar =
       | Slang ->
           [[T "lit"]; [T "savage"]; [T "Mother"]])
  
-let make_matcher_test_genz =
+let make_matcher_test =
    let accept_all string = Some string in
    ((make_matcher genz_grammar accept_all ["Hey"; "Mother"; "Periodt"])
       = Some [])

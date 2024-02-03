@@ -191,3 +191,23 @@ let giant_test2 =
     (Sentence,
      [Grunt, [T "khrgh"]; Shout, [T "aooogah!"];
       Sentence, [N Grunt]; Sentence, [N Shout]])
+
+type grammar_nonterminals_test0 = 
+  | String | AString | BString | CString
+
+let grammar = 
+  String, 
+  [String, [N AString];
+   String, [N BString];  (* This is the blind alley *)
+   AString, [T"a"];
+   AString, [T"a"; N AString];
+   BString, [T"b"; N BString]; (* and this *)
+   CString, [T"c"];]
+
+let filter_blind_alleys_test0 = 
+  filter_blind_alleys grammar =  
+  (String, 
+   [String, [N AString];
+   AString, [T"a"];
+   AString, [T"a"; N AString];
+   CString, [T"c"];])

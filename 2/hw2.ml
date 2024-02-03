@@ -1,3 +1,7 @@
+type ('nonterminal, 'terminal) symbol =
+  | N of 'nonterminal
+  | T of 'terminal
+
 (* 1. To warm up, notice that the format of grammars is different in this assignment, versus Homework 1. Write a function 
    convert_grammar gram1 that returns a Homework 2-style grammar, which is converted from the Homework 1-style grammar gram1. 
    Test your implementation of convert_grammar on the test grammars given in Homework 1. For example, the top-level 
@@ -16,7 +20,7 @@ let rec add_to_alist key value alist =
       if k = key then
         (k, v @ [value]) :: tail  
       else
-        (k, v) :: (add_to_alist key value tail)  
+        (k, v) :: (add_to_alist key value tail);;
 
 
 (* rules: rule list == (awksub_nonterminals * symbol list) list *)
@@ -62,15 +66,82 @@ let rec parse_tree_leaves tree =
    matching prefix. When this happens, the matcher returns whatever the acceptor returned. If no acceptable match is found, the 
    matcher returns None. *)
 
-let make_matcher gram acceptor fragment = None;;
+let make_matcher gram =
+  let rule_matcher_func = snd gram in (* this will return the second item in the tuple (the function) *)
+  let start_sym = fst gram in (* this will return the first item in the tuple (the start symbol) *)
 
+  let rec try_expansions expansions accept frag = 
+      match expansions with
+      | [] -> None (* base case *)
+      | h :: t ->
+        match match_seq h accept frag with
+        | None -> try_expansions t accept frag (* acceptor is not happy, try the other rules *)
+        | Some x -> Some x (* acceptor is happy *)
+
+  and match_seq rule accept frag = 
+      match rule with
+      | [] -> accept frag
+      | sym :: syms -> 
+        match sym with
+        | N nonterminal ->
+            let expansions = rule_matcher_func nonterminal in
+            try_expansions expansions (fun frag -> match_seq syms accept frag) frag
+        | T terminal -> 
+            match frag with 
+            (* keep going in the recursion *)
+            | h :: t when terminal = h -> match_seq syms accept t
+            | _ -> None (* "backtrack" here *)
+
+  in
+
+  let start_expanded = rule_matcher_func start_sym in (* this will return all the possible rules for our start symbol *)
+
+
+  try_expansions start_expanded (* remove accept and frag bc pfa *);;
+ 
 (* 4. Write a function make_parser gram that returns a parser for the grammar gram. When applied to a fragment frag, the parser 
    returns an optional parse tree. If frag cannot be parsed entirely (that is, from beginning to end), the parser returns None. 
    Otherwise, it returns Some tree where tree is the parse tree corresponding to the input fragment. Your parser should try grammar 
    rules in the same order as make_matcher.
 *)
 
-let make_parser gram fragment = None;;
+let parse_tree_acceptor frag tree = (*this*)
+  match frag with
+  | [] -> Some tree
+  | _ -> None
+
+let make_parser gram =
+  let rule_matcher_func = snd gram in (* This will return the rule matching function *)
+  let start_sym = fst gram in (* This will return the start symbol *)
+  
+  (* This is like literally the same as the make_matcher except we have a new param and we're passing in the nonterminal *)
+  let rec try_expansions nonterminal expansions accept frag children =
+     match expansions with
+     | [] -> None (* base case *)
+     | h::t ->
+        match match_seq nonterminal h accept frag children with
+        | None -> try_expansions nonterminal t accept frag children 
+        | Some x -> Some x
+  
+  and match_seq nonterminal rule accept frag children =
+     match rule with
+     | [] -> accept frag (Node(nonterminal, children)) (* Use current nonterminal symbol here *)
+     | sym::syms ->
+        match sym with
+        | N next_nonterminal ->
+              let expansions = rule_matcher_func next_nonterminal in
+              let continue next_frag next_tree = match_seq nonterminal syms accept next_frag (children @ [next_tree]) in
+              try_expansions next_nonterminal expansions continue frag []
+        | T terminal ->
+              match frag with
+              | h::t when terminal = h -> match_seq nonterminal syms accept t (children @ [Leaf terminal])
+              | _ -> None (* "backtrack" here *)
+  
+  in
+  
+  let start_expanded = rule_matcher_func start_sym in
+  fun frag -> try_expansions start_sym start_expanded parse_tree_acceptor frag [];;
+
 
 (* 5. Write one good, nontrivial test case for your make_matcher function. It should be in the style of the test cases given below, 
    but should cover different problem areas. Your test case should be named make_matcher_test. Your test case should test a grammar

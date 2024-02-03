@@ -1,4 +1,53 @@
-Parser is like basically a special version of a matcher that ALWAYS ONLY uses an acceptor like accept_empty_suffix which
-only accepts an empty suffix []. So it makes more sense to me to create the matcher first.
-This is the main difference since both matcher and parser also share the use of a fragment.
+First thoughts: 
+
+Parser is like basically a special version of a matcher that
+ALWAYS ONLY uses an acceptor like  accept_empty_suffix which only accepts an
+empty suffix []. So it makes more sense to me to create the matcher first. 
+This is the main difference since both matcher and parser also share 
+the use of a fragment.
+
+Later thoughts:
+
+1. make_matcher first before make_parser: 
+It made more sense to me to solve the more "general" problem. This eventually
+became useful and *partially* successful in solving make_parser because I was
+able to adapt the core recursive functions try_expansion and match_seq into
+make_parser. 
+
+2. Why do I say that it's partially successful?:
+I have to address the issue of the stark duplication between the two functions. 
+After creating make_matcher, I tried to think of a way of potentially 
+integrating the parse tree in the same function idea and maybe they could just 
+share the same recursive functions as I mentioned above, but make_parser
+needed more arguments (like the parse tree) and I eventually found a lot of
+difficulty in trying to "generalize" the two functions to be used by 
+make_matcher and make_parser so I ended up integrating it back into 
+make_matcher and copied the same code structure for make_parser.
+
+3. Weaknesses:
+- I think one weakness that my code has is that fact that it can be slow when
+  it comes to "complicated" or heavily nested inputs like test case 4. But also
+  I think that this is just the nature of parsing and backtracking?? So I'm not
+  really sure if this is a weakness.
+- The main weakness of this is left recursive grammars or basically when a
+  nonterminal symbol in a grammar rule refers to itself as the first symbol in
+  one of its rules. This will lead to an infinite loop.
+
+  For example this grammar snippet
+
+  type expr_nonterminals =
+    | Expr | ....
+
+  let left_recursive_grammar =
+    (Expr,
+    function
+      | Expr ->
+          [[N Expr; T "+"; N Expr];  (* Left-recursive rule *)
+            [T "num"]])
+      | ...
+  
+  Here, you can see that "Expr" is referred to itself the first rule. This is not
+  a case that is considered in my code and would cause an infinite loop.
+
+
 

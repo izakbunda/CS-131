@@ -1,0 +1,25 @@
+umask 2
+
+wget -O- https://zlib.net/pigz/pigz-2.8.tar.gz |
+  tar xzf -
+cd pigz-2.8
+
+make -j10
+
+install -d -v /usr/local/cs/pigz-2.8/bin /usr/local/cs/pigz-2.8/share/man/man1
+mv -v pigz unpigz /usr/local/cs/pigz-2.8/bin
+install -v -m a+r,a-x pigz.1 /usr/local/cs/pigz-2.8/share/man/man1
+
+cd /usr/local/cs/bin
+for file in $(ls ../pigz-2.8/bin); do
+    test "`ls -iL $file 2>/dev/null`" \
+       = "`cd ../pigz-2.8/bin && ls -iL $file`" ||
+       ln -fsv ../pigz-2.8/bin/$file .
+done
+
+cd /usr/local/cs/share/man
+for file in $(cd ../../pigz-2.8/share/man && echo */*); do
+  test "`ls -iL $file 2>/dev/null`" \
+	= "`cd ../../pigz-2.8/share/man && ls -iL $file`" ||
+    ln -fsv ../../../pigz-2.8/share/man/$file $file || break
+done
